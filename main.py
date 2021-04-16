@@ -1,24 +1,33 @@
 import tcod
 
-from actions import EscapeAction, MovementAction
+from engine import Engine
+from entity import Entity
+from game_map import GameMap
 from input_handlers import EventHandler
 
 
+TITLE = 'KOBOLD-LIKE'
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
-TITLE = 'KOBOLD-LIKE'
+MAP_WIDTH = 80
+MAP_HEIGHT = 45
 
 
 def main() -> None:
-    player_x = SCREEN_WIDTH // 2
-    player_y = SCREEN_HEIGHT // 2
-
     tileset = tcod.tileset.load_tilesheet(
         'dejavu10x10_gs_tc.png', 32, 8, 
         tcod.tileset.CHARMAP_TCOD
     )
 
     event_handler = EventHandler()
+
+    player = Entity(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, '@', (255, 255, 255))
+    npc = Entity(SCREEN_WIDTH // 2 - 5, SCREEN_HEIGHT // 2, '@', (255, 255, 0))
+    entities = {npc, player}
+
+    game_map = GameMap(MAP_WIDTH, MAP_HEIGHT)
+
+    engine = Engine(entities=entities, event_handler=event_handler, game_map=game_map, player=player)
 
     with tcod.context.new_terminal(
         SCREEN_WIDTH,
@@ -29,24 +38,11 @@ def main() -> None:
     ) as context:
         root_console = tcod.Console(SCREEN_WIDTH, SCREEN_HEIGHT, order="F")
         while True:
-            root_console.print(x=player_x, y=player_y, string='@')
+            engine.render(console=root_console, context=context)
 
-            context.present(root_console)
+            events = tcod.event.wait()
 
-            root_console.clear()
-
-            for event in tcod.event.wait():
-                action = event_handler.dispatch(event)
-
-                if action is None:
-                    continue
-
-                if isinstance(action, MovementAction):
-                    player_x += action.dx
-                    player_y += action.dy
-
-                elif isinstance(action, EscapeAction):
-                    raise SystemExit()
+            engine.handle_events(events)
 
 
 if __name__ == '__main__':
