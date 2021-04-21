@@ -25,13 +25,29 @@ class EscapeAction(Action):
         raise SystemExit()
 
 
-class MovementAction(Action):
+class ActionWithDirection(Action):
     def __init__(self, dx: int, dy: int):
         super().__init__()
 
         self.dx = dx
         self.dy = dy
 
+    def perform(self, engine: Engine, entity: Entity) -> None:
+        raise NotImplementedError()
+
+
+class MeleeAttack(ActionWithDirection):
+    def perform(self, engine: Engine, entity: Entity) -> None:
+        dest_x = entity.x + self.dx
+        dest_y = entity.y + self.dy
+        target = engine.game_map.get_blocking_entity_at_location(dest_x, dest_y)
+        if not target:
+            return
+
+        print(f'You kick the {target.name}, vexing it')
+
+
+class MovementAction(ActionWithDirection):
     def perform(self, engine: Engine, entity: Entity) -> None:
         dest_x = entity.x + self.dx
         dest_y = entity.y + self.dy
@@ -40,5 +56,18 @@ class MovementAction(Action):
             return  # destination is out of bounds
         if not engine.game_map.tiles['walkable'][dest_x, dest_y]:
             return  # destination tile is impassible
+        if engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
+            return  # destination blocked by entity
 
         entity.move(self.dx, self.dy)
+
+
+class BumpAction(ActionWithDirection):
+    def perform(self, engine: Engine, entity: Entity) -> None:
+        dest_x = entity.x + self.dx
+        dest_y = entity.y + self.dy
+
+        if engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
+            return MeleeAttack(self.dx, self.dy).perform(engine, entity)
+        else:
+            return MovementAction(self.dx, self.dy).perform(engine, entity)
