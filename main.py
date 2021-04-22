@@ -4,7 +4,6 @@ import tcod
 
 from engine import Engine
 import entity_factories
-from input_handlers import EventHandler
 from procgen import generate_dungeon
 
 
@@ -26,22 +25,22 @@ def main() -> None:
         tcod.tileset.CHARMAP_TCOD
     )
 
-    event_handler = EventHandler()
-
     # can't use spawn() b/c the game_map doesn't exist yet
     player = copy.deepcopy(entity_factories.PLAYER)
 
-    game_map = generate_dungeon(
+    engine = Engine(player=player)
+
+    engine.game_map = generate_dungeon(
         max_rooms=MAX_ROOMS,
         room_min_size=ROOM_MIN_SIZE,
         room_max_size=ROOM_MAX_SIZE,
         map_width=MAP_WIDTH,
         map_height=MAP_HEIGHT,
         max_monsters_per_room=MAX_MONSTERS_PER_ROOM,
-        player=player
+        engine=engine
     )
 
-    engine = Engine(event_handler=event_handler, game_map=game_map, player=player)
+    engine.update_fov()
 
     with tcod.context.new_terminal(
         SCREEN_WIDTH,
@@ -54,9 +53,7 @@ def main() -> None:
         while True:
             engine.render(console=root_console, context=context)
 
-            events = tcod.event.wait()
-
-            engine.handle_events(events)
+            engine.event_handler.handle_events()
 
 
 if __name__ == '__main__':
