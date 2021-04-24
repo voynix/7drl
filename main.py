@@ -2,6 +2,7 @@ import copy
 
 import tcod
 
+import color
 from engine import Engine
 import entity_factories
 from procgen import generate_dungeon
@@ -11,7 +12,7 @@ TITLE = 'KOBOLD-LIKE'
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
 MAP_WIDTH = 80
-MAP_HEIGHT = 45
+MAP_HEIGHT = 43
 
 ROOM_MAX_SIZE = 10
 ROOM_MIN_SIZE = 6
@@ -42,6 +43,8 @@ def main() -> None:
 
     engine.update_fov()
 
+    engine.message_log.add_message('Welcome, kobold adverturer!', color.WELCOME_TEXT)
+
     with tcod.context.new_terminal(
         SCREEN_WIDTH,
         SCREEN_HEIGHT,
@@ -51,9 +54,11 @@ def main() -> None:
     ) as context:
         root_console = tcod.Console(SCREEN_WIDTH, SCREEN_HEIGHT, order="F")
         while True:
-            engine.render(console=root_console, context=context)
+            root_console.clear()
+            engine.event_handler.on_render(console=root_console)
+            context.present(root_console)
 
-            engine.event_handler.handle_events()
+            engine.event_handler.handle_events(context)
 
 
 if __name__ == '__main__':
