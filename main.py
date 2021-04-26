@@ -1,4 +1,5 @@
 import copy
+import traceback
 
 import tcod
 
@@ -18,6 +19,7 @@ ROOM_MAX_SIZE = 10
 ROOM_MIN_SIZE = 6
 MAX_ROOMS = 30
 MAX_MONSTERS_PER_ROOM = 2
+MAX_ITEMS_PER_ROOM = 2
 
 
 def main() -> None:
@@ -38,6 +40,7 @@ def main() -> None:
         map_width=MAP_WIDTH,
         map_height=MAP_HEIGHT,
         max_monsters_per_room=MAX_MONSTERS_PER_ROOM,
+        max_items_per_room=MAX_ITEMS_PER_ROOM,
         engine=engine
     )
 
@@ -58,7 +61,13 @@ def main() -> None:
             engine.event_handler.on_render(console=root_console)
             context.present(root_console)
 
-            engine.event_handler.handle_events(context)
+            try:
+                for event in tcod.event.wait():
+                    context.convert_event(event)
+                    engine.event_handler.handle_events(event)
+            except Exception:
+                traceback.print_exc()  # print stacktrace to stderr
+                engine.message_log.add_message(traceback.format_exc(), color.ERROR)
 
 
 if __name__ == '__main__':
