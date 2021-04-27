@@ -45,6 +45,9 @@ class Fighter(BaseComponent):
 
         return amount_recovered
 
+    def take_damage(self, amount: int) -> None:
+        self.hp -= amount
+
     def die(self) -> None:
         if self.engine.player is self.parent:
             death_message = 'You have died!'
