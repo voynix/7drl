@@ -11,8 +11,8 @@ import tcod
 import color
 from engine import Engine
 import entity_factories
+from game_map import GameWorld
 import input_handlers
-from procgen import generate_dungeon
 
 
 # load the bg and remove the alpha channel
@@ -37,17 +37,18 @@ def new_game() -> Engine:
 
     engine = Engine(player=player)
 
-    engine.game_map = generate_dungeon(
+    engine.game_world = GameWorld(
+        engine=engine,
         max_rooms=MAX_ROOMS,
         room_min_size=ROOM_MIN_SIZE,
         room_max_size=ROOM_MAX_SIZE,
         map_width=MAP_WIDTH,
         map_height=MAP_HEIGHT,
         max_monsters_per_room=MAX_MONSTERS_PER_ROOM,
-        max_items_per_room=MAX_ITEMS_PER_ROOM,
-        engine=engine
+        max_items_per_room=MAX_ITEMS_PER_ROOM
     )
 
+    engine.game_world.generate_floor()
     engine.update_fov()
 
     engine.message_log.add_message('Welcome, kobold adverturer!', color.WELCOME_TEXT)

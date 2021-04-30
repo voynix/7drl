@@ -38,6 +38,15 @@ class WaitAction(Action):
         pass
 
 
+class TakeStairsAction(Action):
+    def perform(self) -> None:
+        if (self.entity.x, self.entity.y) == self.engine.game_map.downstairs_location:
+            self.engine.game_world.generate_floor()
+            self.engine.message_log.add_message('You descend the staircase', color.DESCEND)
+        else:
+            raise exceptions.Impossible('There are no stairs here')
+
+
 class ItemAction(Action):
     def __init__(self, entity: Actor, item: Item, target_xy: Optional[Tuple[int, int]] = None):
         super().__init__(entity)
@@ -129,7 +138,7 @@ class MeleeAction(ActionWithDirection):
             self.engine.message_log.add_message(f'{action_desc} for {damage} damage', attack_color)
             target.fighter.hp -= damage
         else:
-            self.engine.message_log.add_message(f'{attack_desc} but does no damage', attack_color)
+            self.engine.message_log.add_message(f'{action_desc} but does no damage', attack_color)
 
 
 class MovementAction(ActionWithDirection):

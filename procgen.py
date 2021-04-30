@@ -109,6 +109,8 @@ def generate_dungeon(
     dungeon = GameMap(engine, map_width, map_height, entities=[player])
 
     rooms: List[RectangularRoom] = []
+
+    center_of_last_room = (0, 0)
     
     for r in range(max_rooms):
         room_width = random.randint(room_min_size, room_max_size)
@@ -131,8 +133,13 @@ def generate_dungeon(
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.FLOOR
 
+            center_of_last_room = new_room.center
+
         place_entities(new_room, dungeon, max_monsters_per_room, max_items_per_room)
 
         rooms.append(new_room)
+
+    dungeon.tiles[center_of_last_room] = tile_types.STAIRS_DOWN
+    dungeon.downstairs_location = center_of_last_room
 
     return dungeon
