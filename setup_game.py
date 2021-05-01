@@ -24,8 +24,6 @@ MAP_HEIGHT = 43
 ROOM_MAX_SIZE = 10
 ROOM_MIN_SIZE = 6
 MAX_ROOMS = 30
-MAX_MONSTERS_PER_ROOM = 2
-MAX_ITEMS_PER_ROOM = 2
 
 TITLE = 'KOBOLD-LIKE'
 SAVE_FILE = 'savegame.sav'
@@ -43,9 +41,7 @@ def new_game() -> Engine:
         room_min_size=ROOM_MIN_SIZE,
         room_max_size=ROOM_MAX_SIZE,
         map_width=MAP_WIDTH,
-        map_height=MAP_HEIGHT,
-        max_monsters_per_room=MAX_MONSTERS_PER_ROOM,
-        max_items_per_room=MAX_ITEMS_PER_ROOM
+        map_height=MAP_HEIGHT
     )
 
     engine.game_world.generate_floor()
