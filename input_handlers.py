@@ -12,6 +12,7 @@ import exceptions
 
 if TYPE_CHECKING:
     from engine import Engine
+    from entity import Item
 
 
 MOVE_KEYS = {
@@ -476,7 +477,7 @@ class SingleRangedAttackHandler(SelectIndexHandler):
     """Handles targeting a single enemy"""
 
     def __init__(
-        self, engine: Engine, callback: Callable[Tuple[int, int], Optional[Action]]
+        self, engine: Engine, callback: Callable[[Tuple[int, int]], Optional[Action]]
     ):
         super().__init__(engine)
 
@@ -493,7 +494,7 @@ class AreaRangedAttackHandler(SelectIndexHandler):
         self,
         engine: Engine,
         radius: int,
-        callback: Callable[Tuple[int, int], Optional[Action]],
+        callback: Callable[[Tuple[int, int]], Optional[Action]],
     ):
         super().__init__(engine)
 
