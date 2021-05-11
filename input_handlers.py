@@ -337,7 +337,7 @@ class InventoryEventHandler(AskUserEventHandler):
         The menu selects a screen position so as not to occlude the player sprite
         """
         super().on_render(console)
-        number_of_items_in_inventory = len(self.engine.player.inventory.items)
+        number_of_items_in_inventory = len(self.engine.player.inventory.contents)
 
         height = max(number_of_items_in_inventory + 2, 3)
 
@@ -362,12 +362,17 @@ class InventoryEventHandler(AskUserEventHandler):
         )
 
         if number_of_items_in_inventory > 0:
-            for i, item in enumerate(self.engine.player.inventory.items):
+            for i, item_name in enumerate(self.engine.player.inventory.contents):
                 item_key = chr(ord("a") + i)
 
-                item_string = f"({item_key}) {item.name}"
+                item_string = f"({item_key}) {item_name}"
+                item_list = self.engine.player.inventory.item_stack(item_name)
 
-                if self.engine.player.equipment.item_is_equipped(item):
+                if len(item_list) > 1:
+                    item_string = f"{item_string} x{len(item_list)}"
+
+                # assumption: equippable items do not stack
+                if self.engine.player.equipment.item_is_equipped(item_list[0]):
                     item_string = f"{item_string} (E)"
 
                 console.print(x + 1, y + i + 1, item_string)
@@ -381,7 +386,11 @@ class InventoryEventHandler(AskUserEventHandler):
 
         if 0 <= index <= 26:
             try:
-                selected_item = player.inventory.items[index]
+                # this is disgusting, but oh well for now
+                selected_item_name = list(player.inventory.contents.keys())[index]
+                # grab the first item in the stack, if there's a stack
+                # if there's not a stack, grab the item
+                selected_item = player.inventory.item_stack(selected_item_name)[0]
             except IndexError:
                 self.engine.message_log.add_message(
                     "Invalid inventory entry", color.INVALID

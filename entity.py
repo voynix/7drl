@@ -135,6 +135,7 @@ class Item(Entity):
         char: str = "?",
         color: Tuple[int, int, int] = (255, 255, 255),
         name: str = "<Unnamed>",
+        stackable: bool = False,  # does this item stack in inventories?
         consumable: Optional[Consumable] = None,
         equippable: Optional[Equippable] = None
     ):
@@ -147,6 +148,8 @@ class Item(Entity):
             blocks_movement=False,
             render_order=RenderOrder.ITEM,
         )
+
+        self.stackable = stackable
 
         self.consumable = consumable
 

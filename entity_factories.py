@@ -44,36 +44,52 @@ TROLL = Actor(
     level=Level(xp_given=100),
 )
 
-DAGGER = Item(char="/", color=(0, 191, 255), name="Dagger", equippable=Dagger())
-SWORD = Item(char="/", color=(0, 191, 255), name="Sword", equippable=Sword())
+DAGGER = Item(
+    char="/", color=(0, 191, 255), name="Dagger", stackable=False, equippable=Dagger()
+)
+SWORD = Item(
+    char="/", color=(0, 191, 255), name="Sword", stackable=False, equippable=Sword()
+)
 LEATHER_ARMOR = Item(
-    char="[", color=(139, 69, 19), name="Leather Armor", equippable=LeatherArmor()
+    char="[",
+    color=(139, 69, 19),
+    name="Leather Armor",
+    stackable=False,
+    equippable=LeatherArmor(),
 )
 CHAIN_MAIL = Item(
-    char="[", color=(139, 69, 19), name="Chain Mail", equippable=ChainMail()
+    char="[",
+    color=(139, 69, 19),
+    name="Chain Mail",
+    stackable=False,
+    equippable=ChainMail(),
 )
 
 CONFUSION_SCROLL = Item(
     char="~",
     color=(207, 63, 255),
     name="Confusion Scroll",
+    stackable=True,
     consumable=ConfusionConsumable(number_of_turns=10),
 )
 FIREBALL_SCROLL = Item(
     char="~",
     color=(255, 0, 0),
     name="Fireball Scroll",
+    stackable=True,
     consumable=FireballDamageConsumable(damage=12, radius=3),
 )
 HEALTH_POTION = Item(
     char="!",
     color=(127, 0, 255),
     name="Health Potion",
+    stackable=True,
     consumable=HealingConsumable(amount=4),
 )
 LIGHTNING_SCROLL = Item(
     char="~",
     color=(255, 255, 0),
     name="Lightning Scroll",
+    stackable=True,
     consumable=LightningDamageConsumable(damage=20, maximum_range=5),
 )
