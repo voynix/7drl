@@ -31,11 +31,11 @@ class Entity:
         parent: Optional[GameMap] = None,
         x: int = 0,
         y: int = 0,
-        char: str = '?',
+        char: str = "?",
         color: Tuple[int, int, int] = (255, 255, 255),
-        name: str = '<Unnamed>',
+        name: str = "<Unnamed>",
         blocks_movement: bool = False,
-        render_order: RenderOrder = RenderOrder.CORPSE
+        render_order: RenderOrder = RenderOrder.CORPSE,
     ):
         self.x = x
         self.y = y
@@ -87,17 +87,24 @@ class Actor(Entity):
         *,
         x: int = 0,
         y: int = 0,
-        char: str = '?',
+        char: str = "?",
         color: Tuple[int, int, int] = (255, 255, 255),
-        name: str = '<unnamed>',
+        name: str = "<unnamed>",
         ai_cls: Type[BaseAI],
         equipment: Equipment,
         fighter: Fighter,
         inventory: Inventory,
         level: Level
     ):
-        super().__init__(x=x, y=y, char=char, color=color, name=name,
-                         blocks_movement=True, render_order=RenderOrder.ACTOR)
+        super().__init__(
+            x=x,
+            y=y,
+            char=char,
+            color=color,
+            name=name,
+            blocks_movement=True,
+            render_order=RenderOrder.ACTOR,
+        )
 
         self.ai: Optional[BaseAI] = ai_cls(self)
 
@@ -117,7 +124,7 @@ class Actor(Entity):
     def is_alive(self) -> bool:
         """Returns True as long as this actor can perform actions"""
         return bool(self.ai)
-    
+
 
 class Item(Entity):
     def __init__(
@@ -125,17 +132,24 @@ class Item(Entity):
         *,
         x: int = 0,
         y: int = 0,
-        char: str = '?',
+        char: str = "?",
         color: Tuple[int, int, int] = (255, 255, 255),
-        name: str = '<Unnamed>',
+        name: str = "<Unnamed>",
         consumable: Optional[Consumable] = None,
         equippable: Optional[Equippable] = None
     ):
-        super().__init__(x=x, y=y, char=char, color=color, name=name,
-                         blocks_movement=False, render_order=RenderOrder.ITEM)
+        super().__init__(
+            x=x,
+            y=y,
+            char=char,
+            color=color,
+            name=name,
+            blocks_movement=False,
+            render_order=RenderOrder.ITEM,
+        )
 
         self.consumable = consumable
-        
+
         if self.consumable:
             self.consumable.parent = self
 

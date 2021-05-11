@@ -17,17 +17,10 @@ if TYPE_CHECKING:
 # these tables include only the change points
 #  each unlisted floor has the value of most recently listed floor above
 # (floor, max)
-MAX_ITEMS_BY_FLOOR = [
-    (1, 1),
-    (4, 2)
-]
+MAX_ITEMS_BY_FLOOR = [(1, 1), (4, 2)]
 
 # (floor, max)
-MAX_MONSTERS_BY_FLOOR = [
-    (1, 2),
-    (4, 3),
-    (6, 5)
-]
+MAX_MONSTERS_BY_FLOOR = [(1, 2), (4, 3), (6, 5)]
 
 # these tables are cumulative;
 #  each floor has the combined weights of all the floors above
@@ -47,7 +40,10 @@ ENEMY_CHANCES_BY_FLOOR: Dict[int, List[Tuple[Entity, int]]] = {
     6: [(entity_factories.TROLL, 60)],
 }
 
-def get_max_value_for_floor(weighted_chance_by_floor: List[Tuple[int, int]], floor: int) -> int:
+
+def get_max_value_for_floor(
+    weighted_chance_by_floor: List[Tuple[int, int]], floor: int
+) -> int:
     current = 0
 
     for floor_minimum, value in weighted_chance_by_floor:
@@ -58,8 +54,11 @@ def get_max_value_for_floor(weighted_chance_by_floor: List[Tuple[int, int]], flo
     return current
 
 
-def get_entities_at_random(weighted_chance_by_floor: Dict[int, List[Tuple[Entity, int]]],
-                           number_of_entities: int, floor: int) -> List[Entity]:
+def get_entities_at_random(
+    weighted_chance_by_floor: Dict[int, List[Tuple[Entity, int]]],
+    number_of_entities: int,
+    floor: int,
+) -> List[Entity]:
     weighted_entity_chances = {}
 
     for k, v in weighted_chance_by_floor.items():
@@ -71,7 +70,7 @@ def get_entities_at_random(weighted_chance_by_floor: Dict[int, List[Tuple[Entity
     chosen_entities = random.choices(
         list(weighted_entity_chances.keys()),
         weights=list(weighted_entity_chances.values()),
-        k=number_of_entities
+        k=number_of_entities,
     )
 
     return chosen_entities
@@ -98,20 +97,20 @@ class RectangularRoom:
 
     def intersects(self, other: RectangularRoom) -> bool:
         return (
-            self.x1 <= other.x2 and
-            self.x2 >= other.x1 and
-            self.y1 <= other.y2 and
-            self.y2 >= other.y1
+            self.x1 <= other.x2
+            and self.x2 >= other.x1
+            and self.y1 <= other.y2
+            and self.y2 >= other.y1
         )
 
 
-def place_entities(
-    room: RectangularRoom,
-    dungeon: GameMap,
-    floor_number: int
-) -> None:
-    number_of_monsters = random.randint(0, get_max_value_for_floor(MAX_MONSTERS_BY_FLOOR, floor_number))
-    number_of_items = random.randint(0, get_max_value_for_floor(MAX_ITEMS_BY_FLOOR, floor_number))
+def place_entities(room: RectangularRoom, dungeon: GameMap, floor_number: int) -> None:
+    number_of_monsters = random.randint(
+        0, get_max_value_for_floor(MAX_MONSTERS_BY_FLOOR, floor_number)
+    )
+    number_of_items = random.randint(
+        0, get_max_value_for_floor(MAX_ITEMS_BY_FLOOR, floor_number)
+    )
 
     monsters: List[Entity] = get_entities_at_random(
         ENEMY_CHANCES_BY_FLOOR, number_of_monsters, floor_number
@@ -129,7 +128,9 @@ def place_entities(
             entity.spawn(dungeon, x, y)
 
 
-def tunnel_between(start: Tuple[int, int], end: Tuple[int, int]) -> Iterator[Tuple[int, int]]:
+def tunnel_between(
+    start: Tuple[int, int], end: Tuple[int, int]
+) -> Iterator[Tuple[int, int]]:
     """Return an L-shaped tunnel between two points"""
     x1, y1 = start
     x2, y2 = end
@@ -145,7 +146,7 @@ def tunnel_between(start: Tuple[int, int], end: Tuple[int, int]) -> Iterator[Tup
         yield x, y
     for x, y in tcod.los.bresenham((corner_x, corner_y), (x2, y2)):
         yield x, y
-    
+
 
 def generate_dungeon(
     max_rooms: int,
@@ -153,7 +154,7 @@ def generate_dungeon(
     room_max_size: int,
     map_width: int,
     map_height: int,
-    engine: Engine
+    engine: Engine,
 ) -> GameMap:
     player = engine.player
     dungeon = GameMap(engine, map_width, map_height, entities=[player])
@@ -161,7 +162,7 @@ def generate_dungeon(
     rooms: List[RectangularRoom] = []
 
     center_of_last_room = (0, 0)
-    
+
     for r in range(max_rooms):
         room_width = random.randint(room_min_size, room_max_size)
         room_height = random.randint(room_min_size, room_max_size)

@@ -26,7 +26,7 @@ class BaseAI(Action):
         If there is no valid path returns an empty list
         """
         # copy the walkable array
-        cost = np.array(self.entity.gamemap.tiles['walkable'], dtype=np.int8)
+        cost = np.array(self.entity.gamemap.tiles["walkable"], dtype=np.int8)
 
         for entity in self.entity.gamemap.entities:
             # check if the entity blocks movement and the cost isn't zero (ie tile is walkable)
@@ -66,7 +66,9 @@ class HostileEnemy(BaseAI):
 
         if self.path:
             dest_x, dest_y = self.path.pop(0)
-            return MovementAction(self.entity, dest_x - self.entity.x, dest_y - self.entity.y).perform()
+            return MovementAction(
+                self.entity, dest_x - self.entity.x, dest_y - self.entity.y
+            ).perform()
 
         return WaitAction(self.entity).perform()
 
@@ -77,7 +79,9 @@ class ConfusedEnemy(BaseAI):
     If an actor occupies the tile it randomly moves into it will attack
     """
 
-    def __init__(self, entity: Actor, previous_ai: Optional[BaseAI], turns_remaining: int):
+    def __init__(
+        self, entity: Actor, previous_ai: Optional[BaseAI], turns_remaining: int
+    ):
         super().__init__(entity)
 
         self.previous_ai = previous_ai
@@ -85,10 +89,14 @@ class ConfusedEnemy(BaseAI):
 
     def perform(self) -> None:
         if self.turns_remaining <= 0:
-            self.engine.message_log.add_message(f'The {self.entity.name} is no longer confused')
+            self.engine.message_log.add_message(
+                f"The {self.entity.name} is no longer confused"
+            )
             self.entity.ai = self.previous_ai
         else:
-            direction_x, direction_y = random.choice([(-1, -1), (-1, 1), (1, -1), (1, 1), (-1, 0), (1, 0), (0, -1), (0, 1)])
+            direction_x, direction_y = random.choice(
+                [(-1, -1), (-1, 1), (1, -1), (1, 1), (-1, 0), (1, 0), (0, -1), (0, 1)]
+            )
 
             self.turns_remaining -= 1
 

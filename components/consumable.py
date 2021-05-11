@@ -8,7 +8,11 @@ import components.ai
 import components.inventory
 from components.base_component import BaseComponent
 from exceptions import Impossible
-from input_handlers import ActionOrHandler, AreaRangedAttackHandler, SingleRangedAttackHandler
+from input_handlers import (
+    ActionOrHandler,
+    AreaRangedAttackHandler,
+    SingleRangedAttackHandler,
+)
 
 if TYPE_CHECKING:
     from entity import Actor, Item
@@ -42,10 +46,12 @@ class ConfusionConsumable(Consumable):
         self.number_of_turns = number_of_turns
 
     def get_action(self, consumer: Actor) -> Optional[ActionOrHandler]:
-        self.engine.message_log.add_message('Select a target location', color.NEEDS_TARGET)
+        self.engine.message_log.add_message(
+            "Select a target location", color.NEEDS_TARGET
+        )
         return SingleRangedAttackHandler(
             self.engine,
-            callback = lambda xy: actions.ItemAction(consumer, self.parent, xy)
+            callback=lambda xy: actions.ItemAction(consumer, self.parent, xy),
         )
 
     def activate(self, action: actions.ItemAction) -> None:
@@ -53,17 +59,19 @@ class ConfusionConsumable(Consumable):
         target = action.target_actor
 
         if not self.engine.game_map.visible[action.target_xy]:
-            raise Impossible('You cannot target an area you can\'t see')
+            raise Impossible("You cannot target an area you can't see")
         if not target:
-            raise Impossible('You must select an enemy to target')
+            raise Impossible("You must select an enemy to target")
         if target is consumer:
-            raise Impossible('You cannot confuse yourself!')
+            raise Impossible("You cannot confuse yourself!")
 
         self.engine.message_log.add_message(
-            f'The {target.name} begins to stumble around with a vacant look in its eyes',
-            color.STATUS_EFFECT_APPLIED
+            f"The {target.name} begins to stumble around with a vacant look in its eyes",
+            color.STATUS_EFFECT_APPLIED,
         )
-        target.ai = components.ai.ConfusedEnemy(entity=target, previous_ai=target.ai, turns_remaining=self.number_of_turns)
+        target.ai = components.ai.ConfusedEnemy(
+            entity=target, previous_ai=target.ai, turns_remaining=self.number_of_turns
+        )
         self.consume()
 
 
@@ -77,12 +85,12 @@ class HealingConsumable(Consumable):
 
         if amount_recovered > 0:
             self.engine.message_log.add_message(
-                f'You consume the {self.parent.name} and recover {amount_recovered} HP',
-                color.HEALTH_RECOVERED_TEXT
+                f"You consume the {self.parent.name} and recover {amount_recovered} HP",
+                color.HEALTH_RECOVERED_TEXT,
             )
             self.consume()
         else:
-            raise Impossible('You are already at full health')
+            raise Impossible("You are already at full health")
 
 
 class FireballDamageConsumable(Consumable):
@@ -91,30 +99,32 @@ class FireballDamageConsumable(Consumable):
         self.radius = radius
 
     def get_action(self, consumer: Actor) -> Optional[ActionOrHandler]:
-        self.engine.message_log.add_message('Select a target location', color.NEEDS_TARGET)
+        self.engine.message_log.add_message(
+            "Select a target location", color.NEEDS_TARGET
+        )
         return AreaRangedAttackHandler(
             self.engine,
             radius=self.radius,
-            callback=lambda xy: actions.ItemAction(consumer, self.parent, xy)
+            callback=lambda xy: actions.ItemAction(consumer, self.parent, xy),
         )
 
     def activate(self, action: actions.ItemAction) -> None:
         target_xy = action.target_xy
 
         if not self.engine.game_map.visible[target_xy]:
-            raise Impossible('You cannot target an area that you cannot see')
+            raise Impossible("You cannot target an area that you cannot see")
 
         targets_hit = False
         for actor in self.engine.game_map.actors:
             if actor.distance(*target_xy) <= self.radius:
                 self.engine.message_log.add_message(
-                    f'The {actor.name} is engulfed in a fiery explosion and takes {self.damage} damage'
+                    f"The {actor.name} is engulfed in a fiery explosion and takes {self.damage} damage"
                 )
                 actor.fighter.take_damage(self.damage)
                 targets_hit = True
 
         if not targets_hit:
-            raise Impossible('There are no targets in the blast radius')
+            raise Impossible("There are no targets in the blast radius")
         self.consume()
 
 
@@ -138,9 +148,9 @@ class LightningDamageConsumable(Consumable):
 
         if target:
             self.engine.message_log.add_message(
-                f'A lightning bolt strikes the {target.name} with a loud thunder for {self.damage} damage',
+                f"A lightning bolt strikes the {target.name} with a loud thunder for {self.damage} damage",
             )
             target.fighter.take_damage(self.damage)
             self.consume()
         else:
-            raise Impossible('There are no enemies close enough to strike')
+            raise Impossible("There are no enemies close enough to strike")

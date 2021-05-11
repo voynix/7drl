@@ -14,16 +14,18 @@ if TYPE_CHECKING:
 
 
 class GameMap:
-    def __init__(self, engine: Engine, width: int, height: int, entities: Iterable[Entity] = ()):
+    def __init__(
+        self, engine: Engine, width: int, height: int, entities: Iterable[Entity] = ()
+    ):
         self.engine = engine
         self.width, self.height = width, height
         self.entities = set(entities)
-        self.tiles = np.full((width, height), fill_value=tile_types.WALL, order='F')
+        self.tiles = np.full((width, height), fill_value=tile_types.WALL, order="F")
 
         # tiles that are currently visible
-        self.visible = np.full((width, height), fill_value=False, order='F')
+        self.visible = np.full((width, height), fill_value=False, order="F")
         # tiles that were visible but are not currently visible
-        self.explored = np.full((width, height), fill_value=False, order='F')
+        self.explored = np.full((width, height), fill_value=False, order="F")
 
         self.downstairs_location = (0, 0)
 
@@ -38,20 +40,27 @@ class GameMap:
             for entity in self.entities
             if isinstance(entity, Actor) and entity.is_alive
         )
-    
+
     @property
     def items(self) -> Iterator[Item]:
         yield from (entity for entity in self.entities if isinstance(entity, Item))
-    
 
-    def get_blocking_entity_at_location(self, location_x: int, location_y: int) -> Optional[Entity]:
+    def get_blocking_entity_at_location(
+        self, location_x: int, location_y: int
+    ) -> Optional[Entity]:
         for entity in self.entities:
-            if entity.blocks_movement and entity.x == location_x and entity.y == location_y:
+            if (
+                entity.blocks_movement
+                and entity.x == location_x
+                and entity.y == location_y
+            ):
                 return entity
 
         return None
 
-    def get_actor_at_location(self, location_x: int, location_y: int) -> Optional[Actor]:
+    def get_actor_at_location(
+        self, location_x: int, location_y: int
+    ) -> Optional[Actor]:
         for actor in self.actors:
             if actor.x == location_x and actor.y == location_y:
                 return actor
@@ -70,10 +79,10 @@ class GameMap:
         If it isn't but is explored, draw w/ dark colors
         Otherwise, draw as SHROUD
         """
-        console.tiles_rgb[0:self.width, 0:self.height] = np.select(
+        console.tiles_rgb[0 : self.width, 0 : self.height] = np.select(
             condlist=[self.visible, self.explored],
-            choicelist=[self.tiles['light'], self.tiles['dark']],
-            default=tile_types.SHROUD
+            choicelist=[self.tiles["light"], self.tiles["dark"]],
+            default=tile_types.SHROUD,
         )
 
         sorted_entities = sorted(self.entities, key=lambda x: x.render_order.value)
@@ -125,5 +134,5 @@ class GameWorld:
             room_max_size=self.room_max_size,
             map_width=self.map_width,
             map_height=self.map_height,
-            engine=self.engine
+            engine=self.engine,
         )

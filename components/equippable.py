@@ -16,7 +16,7 @@ class Equippable(BaseComponent):
         self,
         equipment_type: EquipmentType,
         power_bonus: int = 0,
-        defense_bonus: int = 0
+        defense_bonus: int = 0,
     ):
         self.equipment_type = equipment_type
 

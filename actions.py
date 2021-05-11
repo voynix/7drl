@@ -20,7 +20,6 @@ class Action:
     def engine(self) -> Engine:
         """Return the engine this action belongs to"""
         return self.entity.gamemap.engine
-    
 
     def perform(self) -> None:
         """
@@ -42,13 +41,17 @@ class TakeStairsAction(Action):
     def perform(self) -> None:
         if (self.entity.x, self.entity.y) == self.engine.game_map.downstairs_location:
             self.engine.game_world.generate_floor()
-            self.engine.message_log.add_message('You descend the staircase', color.DESCEND)
+            self.engine.message_log.add_message(
+                "You descend the staircase", color.DESCEND
+            )
         else:
-            raise exceptions.Impossible('There are no stairs here')
+            raise exceptions.Impossible("There are no stairs here")
 
 
 class ItemAction(Action):
-    def __init__(self, entity: Actor, item: Item, target_xy: Optional[Tuple[int, int]] = None):
+    def __init__(
+        self, entity: Actor, item: Item, target_xy: Optional[Tuple[int, int]] = None
+    ):
         super().__init__(entity)
         self.item = item
         if not target_xy:
@@ -63,7 +66,6 @@ class ItemAction(Action):
     def perform(self) -> None:
         if self.item.consumable:
             self.item.consumable.activate(self)
-
 
 
 class DropItemAction(ItemAction):
@@ -86,16 +88,16 @@ class PickupAction(Action):
         for item in self.engine.game_map.items:
             if actor_location_x == item.x and actor_location_y == item.y:
                 if len(inventory.items) >= inventory.capacity:
-                    raise exceptions.Impossible('Your inventory is full')
+                    raise exceptions.Impossible("Your inventory is full")
 
                 self.engine.game_map.entities.remove(item)
                 item.parent = self.entity.inventory
                 inventory.items.append(item)
 
-                self.engine.message_log.add_message(f'You pick up the {item.name}')
+                self.engine.message_log.add_message(f"You pick up the {item.name}")
                 return
 
-        raise exceptions.Impossible('There is nothing to pick up')
+        raise exceptions.Impossible("There is nothing to pick up")
 
 
 class EquipAction(Action):
@@ -119,7 +121,7 @@ class ActionWithDirection(Action):
     def dest_xy(self) -> Tuple[int, int]:
         """Return this action's destination"""
         return self.entity.x + self.dx, self.entity.y + self.dy
-    
+
     @property
     def blocking_entity(self) -> Optional[Entity]:
         """Return the blocking entity, if any, at this action's destination"""
@@ -138,21 +140,25 @@ class MeleeAction(ActionWithDirection):
     def perform(self) -> None:
         target = self.target_actor
         if not target:
-            raise exceptions.Impossible('Nothing to attack')
+            raise exceptions.Impossible("Nothing to attack")
 
         damage = self.entity.fighter.power - target.fighter.defense
 
-        action_desc = f'{self.entity.name.capitalize()} attacks {target.name}'
+        action_desc = f"{self.entity.name.capitalize()} attacks {target.name}"
         if self.entity is self.engine.player:
             attack_color = color.PLAYER_ATK
         else:
             attack_color = color.ENEMY_ATK
 
         if damage > 0:
-            self.engine.message_log.add_message(f'{action_desc} for {damage} damage', attack_color)
+            self.engine.message_log.add_message(
+                f"{action_desc} for {damage} damage", attack_color
+            )
             target.fighter.hp -= damage
         else:
-            self.engine.message_log.add_message(f'{action_desc} but does no damage', attack_color)
+            self.engine.message_log.add_message(
+                f"{action_desc} but does no damage", attack_color
+            )
 
 
 class MovementAction(ActionWithDirection):
@@ -160,11 +166,17 @@ class MovementAction(ActionWithDirection):
         dest_x, dest_y = self.dest_xy
 
         if not self.engine.game_map.in_bounds(dest_x, dest_y):
-            raise exceptions.Impossible('Your path is blocked')  # destination is out of bounds
-        if not self.engine.game_map.tiles['walkable'][dest_x, dest_y]:
-            raise exceptions.Impossible('Your path is blocked')  # destination tile is impassible
+            raise exceptions.Impossible(
+                "Your path is blocked"
+            )  # destination is out of bounds
+        if not self.engine.game_map.tiles["walkable"][dest_x, dest_y]:
+            raise exceptions.Impossible(
+                "Your path is blocked"
+            )  # destination tile is impassible
         if self.engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
-            raise exceptions.Impossible('Your path is blocked')  # destination blocked by entity
+            raise exceptions.Impossible(
+                "Your path is blocked"
+            )  # destination blocked by entity
 
         self.entity.move(self.dx, self.dy)
 
