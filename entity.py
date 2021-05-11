@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from components.consumable import Consumable
     from components.equipment import Equipment
     from components.equippable import Equippable
-    from components.figher import Fighter
+    from components.fighter import Fighter
     from components.inventory import Inventory
     from components.level import Level
     from game_map import GameMap
