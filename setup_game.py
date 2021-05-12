@@ -18,8 +18,12 @@ import input_handlers
 # load the bg and remove the alpha channel
 BACKGROUND_IMAGE = tcod.image.load("menu_background.png")[:, :, :3]
 
+# TODO: change these to random ranges used in proc_gen.py
 MAP_WIDTH = 80
 MAP_HEIGHT = 43
+
+VIEWPORT_WIDTH = 80
+VIEWPORT_HEIGHT = 43
 
 ROOM_MAX_SIZE = 10
 ROOM_MIN_SIZE = 6
@@ -33,7 +37,9 @@ def new_game() -> Engine:
     # can't use spawn() b/c the game_map doesn't exist yet
     player = copy.deepcopy(entity_factories.PLAYER)
 
-    engine = Engine(player=player)
+    engine = Engine(
+        player=player, viewport_width=VIEWPORT_WIDTH, viewport_height=VIEWPORT_HEIGHT
+    )
 
     engine.game_world = GameWorld(
         engine=engine,

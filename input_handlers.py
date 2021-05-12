@@ -129,6 +129,13 @@ class EventHandler(BaseEventHandler):
         return True
 
     def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
+        # TODO: allow for free-scrolling by updating the game_map's viewport_anchor
+        # TODO: if we're in a free-look event_handler
+        # TODO: (check by isinstance? or by setting a flag explicitly?)
+        # TODO: will also need to save the viewport_anchor position before hand
+        # TODO: so we can snap back when exiting the free lock mode
+        # TODO: call explicit enable/disable_free_look() functions to handle this?
+        # TODO: implement them on this class????
         if self.engine.game_map.in_bounds(event.tile.x, event.tile.y):
             self.engine.mouse_location = event.tile.x, event.tile.y
 

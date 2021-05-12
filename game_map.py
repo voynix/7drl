@@ -19,6 +19,8 @@ class GameMap:
     ):
         self.engine = engine
         self.width, self.height = width, height
+        # the top-left point of the viewport in map-space
+        self.viewport_anchor_x, self.viewport_anchor_y = 0, 0
         self.entities = set(entities)
         self.tiles = np.full((width, height), fill_value=tile_types.WALL, order="F")
 
@@ -71,7 +73,9 @@ class GameMap:
         """Return True if x and y are inside the bounds of this map"""
         return 0 <= x < self.width and 0 <= y < self.height
 
-    def render(self, console: Console) -> None:
+    def render(
+        self, console: Console, viewport_width: int, viewport_height: int
+    ) -> None:
         """
         Renders the map
 
@@ -79,15 +83,31 @@ class GameMap:
         If it isn't but is explored, draw w/ dark colors
         Otherwise, draw as SHROUD
         """
-        console.tiles_rgb[0 : self.width, 0 : self.height] = np.select(
-            condlist=[self.visible, self.explored],
-            choicelist=[self.tiles["light"], self.tiles["dark"]],
+        x_start = self.viewport_anchor_x
+        x_end = x_start + viewport_width
+        y_start = self.viewport_anchor_y
+        y_end = y_start + viewport_height
+        console.tiles_rgb[0:viewport_width, 0:viewport_height] = np.select(
+            condlist=[
+                self.visible[x_start:x_end, y_start:y_end],
+                self.explored[x_start:x_end, y_start:y_end],
+            ],
+            choicelist=[
+                self.tiles[x_start:x_end, y_start:y_end]["light"],
+                self.tiles[x_start:x_end, y_start:y_end]["dark"],
+            ],
             default=tile_types.SHROUD,
         )
 
         sorted_entities = sorted(self.entities, key=lambda x: x.render_order.value)
 
         for entity in sorted_entities:
-            # only draw visible entities
-            if self.visible[entity.x, entity.y]:
-                console.print(entity.x, entity.y, entity.char, fg=entity.color)
+            # only draw visible entities in the viewport
+            if (
+                self.visible[entity.x, entity.y]
+                and x_start < entity.x < x_end
+                and y_start < entity.y < y_end
+            ):
+                console.print(
+                    entity.x - x_start, entity.y - y_start, entity.char, fg=entity.color
+                )

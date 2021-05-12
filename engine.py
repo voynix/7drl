@@ -24,10 +24,12 @@ class Engine:
     game_map: GameMap
     game_world: GameWorld
 
-    def __init__(self, player: Actor):
+    def __init__(self, player: Actor, viewport_width: int, viewport_height: int):
         self.message_log = MessageLog()
         self.mouse_location = (0, 0)
         self.player = player
+        self.viewport_width = viewport_width
+        self.viewport_height = viewport_height
 
     def handle_enemy_turns(self) -> None:
         for entity in set(self.game_map.actors) - {self.player}:
@@ -47,7 +49,7 @@ class Engine:
         self.game_map.explored |= self.game_map.visible
 
     def render(self, console: Console) -> None:
-        self.game_map.render(console)
+        self.game_map.render(console, self.viewport_width, self.viewport_height)
 
         self.message_log.render(console=console, x=21, y=45, width=40, height=5)
 

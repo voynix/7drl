@@ -174,6 +174,7 @@ class MovementAction(ActionWithDirection):
                 "Your path is blocked"
             )  # destination blocked by entity
 
+        # TODO: update the game_map's viewport_anchor if the entity is the player
         self.entity.move(self.dx, self.dy)
 
 
