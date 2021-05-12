@@ -11,7 +11,7 @@ import tcod
 import color
 from engine import Engine
 import entity_factories
-from game_map import GameWorld
+from game_world import GameWorld
 import input_handlers
 
 
