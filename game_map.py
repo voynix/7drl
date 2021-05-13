@@ -87,6 +87,12 @@ class GameMap:
         x_end = x_start + viewport_width
         y_start = self.viewport_anchor_y
         y_end = y_start + viewport_height
+
+        assert 0 <= x_start < len(self.visible)
+        assert 0 <= y_start < len(self.visible[0])
+        assert 0 < x_end <= len(self.visible)
+        assert 0 < y_end <= len(self.visible[0])
+
         console.tiles_rgb[0:viewport_width, 0:viewport_height] = np.select(
             condlist=[
                 self.visible[x_start:x_end, y_start:y_end],
