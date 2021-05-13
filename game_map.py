@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, Iterator, Optional, TYPE_CHECKING
+from typing import Iterable, Iterator, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np  # type: ignore
 from tcod.console import Console
@@ -72,6 +72,13 @@ class GameMap:
     def in_bounds(self, x: int, y: int) -> bool:
         """Return True if x and y are inside the bounds of this map"""
         return 0 <= x < self.width and 0 <= y < self.height
+
+    def viewport_to_map_coord(self, vp: Tuple[int, int]) -> Tuple[int, int]:
+        vp_x, vp_y = vp
+        map_x = vp_x + self.viewport_anchor_x
+        map_y = vp_y + self.viewport_anchor_y
+
+        return map_x, map_y
 
     def render(
         self, console: Console, viewport_width: int, viewport_height: int

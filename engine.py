@@ -26,7 +26,7 @@ class Engine:
 
     def __init__(self, player: Actor, viewport_width: int, viewport_height: int):
         self.message_log = MessageLog()
-        self.mouse_location = (0, 0)
+        self.mouse_location = (0, 0)  # in viewport-space
         self.player = player
         self.viewport_width = viewport_width
         self.viewport_height = viewport_height
