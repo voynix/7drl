@@ -19,8 +19,8 @@ import input_handlers
 BACKGROUND_IMAGE = tcod.image.load("menu_background.png")[:, :, :3]
 
 # TODO: change these to random ranges used in proc_gen.py
-MAP_WIDTH = 80
-MAP_HEIGHT = 43
+MAP_WIDTH = 120
+MAP_HEIGHT = 64
 
 VIEWPORT_WIDTH = 80
 VIEWPORT_HEIGHT = 43

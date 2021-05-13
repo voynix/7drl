@@ -12,6 +12,10 @@ if TYPE_CHECKING:
     from engine import Engine
     from entity import Entity
 
+# TODO: put this in setup_game and thread it through
+# how close the player can get to the edge of the screen before the viewport anchor moves
+VIEWPORT_MARGIN = (10, 10)
+
 
 class GameMap:
     def __init__(
@@ -20,7 +24,9 @@ class GameMap:
         self.engine = engine
         self.width, self.height = width, height
         # the top-left point of the viewport in map-space
+        # adjust_viewport_anchor() will fix this up before first run
         self.viewport_anchor_x, self.viewport_anchor_y = 0, 0
+        self.viewport_margin_x, self.viewport_margin_y = VIEWPORT_MARGIN
         self.entities = set(entities)
         self.tiles = np.full((width, height), fill_value=tile_types.WALL, order="F")
 
@@ -80,6 +86,22 @@ class GameMap:
 
         return map_x, map_y
 
+    def adjust_viewport_anchor(
+        self, player_x: int, player_y: int, viewport_width: int, viewport_height: int
+    ) -> None:
+        """Move the viewport_anchor if the player is too close to the edge of the viewport"""
+        player_vp_x = player_x - self.viewport_anchor_x
+        if player_vp_x < self.viewport_margin_x:
+            self.viewport_anchor_x = player_x - self.viewport_margin_x
+        elif viewport_width - player_vp_x < self.viewport_margin_x:
+            self.viewport_anchor_x = player_x + self.viewport_margin_x - viewport_width
+
+        player_vp_y = player_y - self.viewport_anchor_y
+        if player_vp_y < self.viewport_margin_y:
+            self.viewport_anchor_y = player_y - self.viewport_margin_y
+        elif viewport_height - player_vp_y < self.viewport_margin_y:
+            self.viewport_anchor_y = player_y + self.viewport_margin_y - viewport_height
+
     def render(
         self, console: Console, viewport_width: int, viewport_height: int
     ) -> None:
@@ -90,17 +112,26 @@ class GameMap:
         If it isn't but is explored, draw w/ dark colors
         Otherwise, draw as SHROUD
         """
-        x_start = self.viewport_anchor_x
-        x_end = x_start + viewport_width
-        y_start = self.viewport_anchor_y
-        y_end = y_start + viewport_height
+        self.adjust_viewport_anchor(
+            self.engine.player.x, self.engine.player.y, viewport_width, viewport_height
+        )
 
-        assert 0 <= x_start < len(self.visible)
-        assert 0 <= y_start < len(self.visible[0])
-        assert 0 < x_end <= len(self.visible)
-        assert 0 < y_end <= len(self.visible[0])
+        # bounds of the viewport in map-space, clamped to the map bounds
+        x_start = max(self.viewport_anchor_x, 0)
+        x_end = min(self.viewport_anchor_x + viewport_width, self.width)
+        y_start = max(self.viewport_anchor_y, 0)
+        y_end = min(self.viewport_anchor_y + viewport_height, self.height)
 
-        console.tiles_rgb[0:viewport_width, 0:viewport_height] = np.select(
+        # init a new viewport buffer on the assumption that everything's off the map
+        new_tiles = np.full(
+            (viewport_width, viewport_height), fill_value=tile_types.EXTERNAL, order="F"
+        )
+
+        # blit the map rectangle onto the new viewport buffer
+        new_tiles[
+            x_start - self.viewport_anchor_x : x_end - self.viewport_anchor_x,
+            y_start - self.viewport_anchor_y : y_end - self.viewport_anchor_y,
+        ] = np.select(
             condlist=[
                 self.visible[x_start:x_end, y_start:y_end],
                 self.explored[x_start:x_end, y_start:y_end],
@@ -112,6 +143,8 @@ class GameMap:
             default=tile_types.SHROUD,
         )
 
+        console.tiles_rgb[0:viewport_width, 0:viewport_height] = new_tiles
+
         sorted_entities = sorted(self.entities, key=lambda x: x.render_order.value)
 
         for entity in sorted_entities:
@@ -122,5 +155,5 @@ class GameMap:
                 and y_start <= entity.y < y_end
             ):
                 console.print(
-                    entity.x - x_start, entity.y - y_start, entity.char, fg=entity.color
+                    entity.x - self.viewport_anchor_x, entity.y - self.viewport_anchor_y, entity.char, fg=entity.color
                 )

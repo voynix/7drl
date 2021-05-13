@@ -35,6 +35,9 @@ def new_tile(
     return np.array((walkable, transparent, dark, light), dtype=tile_dt)
 
 
+# tiles 'outside' of the map itself
+EXTERNAL = np.array((ord(" "), (255, 255, 255), (0, 0, 0)), dtype=graphic_dt)
+
 # unexplored, unseen tiles
 SHROUD = np.array((ord(" "), (255, 255, 255), (0, 0, 0)), dtype=graphic_dt)
 

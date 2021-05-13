@@ -66,6 +66,13 @@ class Engine:
             location=(0, 47),
         )
 
+        # render_functions.render_graphics_debug(
+        #     console=console,
+        #     player=self.player,
+        #     game_map=self.game_map,
+        #     location=(0, 48)
+        # )
+
         render_functions.render_names_at_mouse_location(
             console=console, x=21, y=44, engine=self
         )
