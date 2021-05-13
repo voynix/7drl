@@ -105,8 +105,8 @@ class GameMap:
             # only draw visible entities in the viewport
             if (
                 self.visible[entity.x, entity.y]
-                and x_start < entity.x < x_end
-                and y_start < entity.y < y_end
+                and x_start <= entity.x < x_end
+                and y_start <= entity.y < y_end
             ):
                 console.print(
                     entity.x - x_start, entity.y - y_start, entity.char, fg=entity.color
