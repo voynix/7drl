@@ -66,6 +66,9 @@ class ConfusionConsumable(Consumable):
             raise Impossible("You cannot confuse yourself!")
 
         self.engine.message_log.add_message(
+            f"You activate the {self.parent.name}. It shudders with mystic power."
+        )
+        self.engine.message_log.add_message(
             f"The {target.name} begins to stumble around with a vacant look in its eyes",
             color.STATUS_EFFECT_APPLIED,
         )
@@ -114,17 +117,22 @@ class FireballDamageConsumable(Consumable):
         if not self.engine.game_map.visible[target_xy]:
             raise Impossible("You cannot target an area that you cannot see")
 
-        targets_hit = False
+        targets = []
         for actor in self.engine.game_map.actors:
             if actor.distance(*target_xy) <= self.radius:
-                self.engine.message_log.add_message(
-                    f"The {actor.name} is engulfed in a fiery explosion and takes {self.damage} damage"
-                )
-                actor.fighter.take_damage(self.damage)
-                targets_hit = True
-
-        if not targets_hit:
+                targets.append(actor)
+        if not targets:
             raise Impossible("There are no targets in the blast radius")
+
+        self.engine.message_log.add_message(
+            f"You activate the {self.parent.name}. It scorches your hand with mystic power."
+        )
+        for target in targets:
+            self.engine.message_log.add_message(
+                f"The {target.name} is engulfed in a fiery explosion and takes {self.damage} damage"
+            )
+            target.fighter.take_damage(self.damage)
+
         self.consume()
 
 
@@ -147,6 +155,9 @@ class LightningDamageConsumable(Consumable):
                     closest_distance = distance
 
         if target:
+            self.engine.message_log.add_message(
+                f"You activate the {self.parent.name}. It crackles with mystic power."
+            )
             self.engine.message_log.add_message(
                 f"A lightning bolt strikes the {target.name} with a loud thunder for {self.damage} damage",
             )
