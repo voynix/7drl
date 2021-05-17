@@ -168,6 +168,8 @@ class MainGameEventHandler(EventHandler):
             return CharacterScreenEventHandler(self.engine)
         elif key == tcod.event.K_SLASH:
             return LookHandler(self.engine)
+        elif key == tcod.event.K_e:
+            self.engine.debug_mode = not self.engine.debug_mode
         elif key == tcod.event.K_ESCAPE:
             raise SystemExit()
 

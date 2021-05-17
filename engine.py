@@ -30,6 +30,7 @@ class Engine:
         self.player = player
         self.viewport_width = viewport_width
         self.viewport_height = viewport_height
+        self.debug_mode = False
 
     def handle_enemy_turns(self) -> None:
         for entity in set(self.game_map.actors) - {self.player}:
@@ -66,12 +67,13 @@ class Engine:
             location=(0, 47),
         )
 
-        # render_functions.render_graphics_debug(
-        #     console=console,
-        #     player=self.player,
-        #     game_map=self.game_map,
-        #     location=(0, 48)
-        # )
+        if self.debug_mode:
+            render_functions.render_graphics_debug(
+                console=console,
+                player=self.player,
+                game_map=self.game_map,
+                location=(0, 48),
+            )
 
         render_functions.render_names_at_mouse_location(
             console=console, x=21, y=44, engine=self
