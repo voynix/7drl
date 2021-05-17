@@ -430,7 +430,9 @@ class SelectIndexHandler(AskUserEventHandler):
         super().__init__(engine)
         player = self.engine.player
         # convert from map-space back to viewport-space
-        engine.mouse_location = self.engine.game_map.map_to_viewport_coord((player.x, player.y))
+        engine.mouse_location = self.engine.game_map.map_to_viewport_coord(
+            (player.x, player.y)
+        )
 
     def on_render(self, console: tcod.Console) -> None:
         """Highlight the tile under the cursor"""
@@ -461,7 +463,9 @@ class SelectIndexHandler(AskUserEventHandler):
             return None
         elif key in CONFIRM_KEYS:
             # convert from viewport-space to map-space
-            mouse_location_map = self.engine.game_map.viewport_to_map_coord(self.engine.mouse_location)
+            mouse_location_map = self.engine.game_map.viewport_to_map_coord(
+                self.engine.mouse_location
+            )
             return self.on_index_selected(*mouse_location_map)
         return super().ev_keydown(event)
 
@@ -471,7 +475,9 @@ class SelectIndexHandler(AskUserEventHandler):
         if self.engine.game_map.in_bounds(*event.tile):
             if event.button == 1:
                 # convert from viewport-space to map-space
-                mouse_location_map = self.engine.game_map.viewport_to_map_coord(event.tile)
+                mouse_location_map = self.engine.game_map.viewport_to_map_coord(
+                    event.tile
+                )
                 return self.on_index_selected(*mouse_location_map)
         return super().ev_mousebuttondown(event)
 

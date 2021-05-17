@@ -162,5 +162,8 @@ class GameMap:
                 and y_start <= entity.y < y_end
             ):
                 console.print(
-                    entity.x - self.viewport_anchor_x, entity.y - self.viewport_anchor_y, entity.char, fg=entity.color
+                    entity.x - self.viewport_anchor_x,
+                    entity.y - self.viewport_anchor_y,
+                    entity.char,
+                    fg=entity.color,
                 )

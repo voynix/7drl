@@ -53,7 +53,11 @@ def render_graphics_debug(
     x, y = location
 
     console.print(x=x, y=y, string=f"Player @: {player.x}, {player.y}")
-    console.print(x=x, y=y+1, string=f"VP anchor: {game_map.viewport_anchor_x}, {game_map.viewport_anchor_y}")
+    console.print(
+        x=x,
+        y=y + 1,
+        string=f"VP anchor: {game_map.viewport_anchor_x}, {game_map.viewport_anchor_y}",
+    )
 
 
 def render_names_at_mouse_location(
