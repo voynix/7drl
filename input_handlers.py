@@ -129,13 +129,6 @@ class EventHandler(BaseEventHandler):
         return True
 
     def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
-        # TODO: allow for free-scrolling by updating the game_map's viewport_anchor
-        # TODO: if we're in a free-look event_handler
-        # TODO: (check by isinstance? or by setting a flag explicitly?)
-        # TODO: will also need to save the viewport_anchor position before hand
-        # TODO: so we can snap back when exiting the free lock mode
-        # TODO: call explicit enable/disable_free_look() functions to handle this?
-        # TODO: implement them on this class????
         if self.engine.game_map.in_bounds(event.tile.x, event.tile.y):
             self.engine.mouse_location = event.tile.x, event.tile.y
 
@@ -436,7 +429,8 @@ class SelectIndexHandler(AskUserEventHandler):
     def __init__(self, engine: Engine):
         super().__init__(engine)
         player = self.engine.player
-        engine.mouse_location = player.x, player.y
+        # convert from map-space back to viewport-space
+        engine.mouse_location = self.engine.game_map.map_to_viewport_coord((player.x, player.y))
 
     def on_render(self, console: tcod.Console) -> None:
         """Highlight the tile under the cursor"""
@@ -460,13 +454,15 @@ class SelectIndexHandler(AskUserEventHandler):
             dx, dy = MOVE_KEYS[key]
             x += dx * modifier
             y += dy * modifier
-            # clamp to map size
-            x = max(0, min(x, self.engine.game_map.width - 1))
-            y = max(0, min(y, self.engine.game_map.height - 1))
+            # clamp to viewport
+            x = max(0, min(x, self.engine.viewport_width - 1))
+            y = max(0, min(y, self.engine.viewport_height - 1))
             self.engine.mouse_location = x, y
             return None
         elif key in CONFIRM_KEYS:
-            return self.on_index_selected(*self.engine.mouse_location)
+            # convert from viewport-space to map-space
+            mouse_location_map = self.engine.game_map.viewport_to_map_coord(self.engine.mouse_location)
+            return self.on_index_selected(*mouse_location_map)
         return super().ev_keydown(event)
 
     def ev_mousebuttondown(
@@ -474,7 +470,9 @@ class SelectIndexHandler(AskUserEventHandler):
     ) -> Optional[ActionOrHandler]:
         if self.engine.game_map.in_bounds(*event.tile):
             if event.button == 1:
-                return self.on_index_selected(*event.tile)
+                # convert from viewport-space to map-space
+                mouse_location_map = self.engine.game_map.viewport_to_map_coord(event.tile)
+                return self.on_index_selected(*mouse_location_map)
         return super().ev_mousebuttondown(event)
 
     def on_index_selected(self, x: int, y: int) -> Optional[ActionOrHandler]:

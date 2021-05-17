@@ -79,6 +79,13 @@ class GameMap:
         """Return True if x and y are inside the bounds of this map"""
         return 0 <= x < self.width and 0 <= y < self.height
 
+    def map_to_viewport_coord(self, map_c: Tuple[int, int]) -> Tuple[int, int]:
+        map_x, map_y = map_c
+        vp_x = map_x - self.viewport_anchor_x
+        vp_y = map_y - self.viewport_anchor_y
+
+        return vp_x, vp_y
+
     def viewport_to_map_coord(self, vp: Tuple[int, int]) -> Tuple[int, int]:
         vp_x, vp_y = vp
         map_x = vp_x + self.viewport_anchor_x
