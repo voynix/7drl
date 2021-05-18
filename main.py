@@ -3,6 +3,7 @@ import traceback
 import tcod
 
 import color
+import constants
 import exceptions
 import input_handlers
 import setup_game
@@ -29,7 +30,7 @@ def main() -> None:
         columns=SCREEN_WIDTH,
         rows=SCREEN_HEIGHT,
         tileset=tileset,
-        title=setup_game.TITLE,
+        title=constants.TITLE,
         vsync=True,
     ) as context:
         root_console = tcod.Console(SCREEN_WIDTH, SCREEN_HEIGHT, order="F")
@@ -52,9 +53,9 @@ def main() -> None:
         except exceptions.QuitWithoutSaving:
             raise
         except SystemExit:  # save and quit
-            save_game(handler, setup_game.SAVE_FILE)
+            save_game(handler, constants.SAVE_FILE)
         except BaseException:  # save on unexpected exceptions
-            save_game(handler, setup_game.SAVE_FILE)
+            save_game(handler, constants.SAVE_FILE)
 
 
 if __name__ == "__main__":

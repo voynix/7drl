@@ -9,6 +9,7 @@ from typing import Optional
 import tcod
 
 import color
+import constants
 from engine import Engine
 import entity_factories
 from game_world import GameWorld
@@ -28,9 +29,6 @@ VIEWPORT_HEIGHT = 43
 ROOM_MAX_SIZE = 10
 ROOM_MIN_SIZE = 6
 MAX_ROOMS = 30
-
-TITLE = "KOBOLD-LIKE"
-SAVE_FILE = "savegame.sav"
 
 
 def new_game() -> Engine:
@@ -83,7 +81,7 @@ class MainMenu(input_handlers.BaseEventHandler):
         console.print(
             console.width // 2,
             console.height // 2 - 4,
-            TITLE,
+            constants.TITLE,
             fg=color.MENU_TITLE,
             alignment=tcod.CENTER,
         )
@@ -116,7 +114,9 @@ class MainMenu(input_handlers.BaseEventHandler):
             raise SystemExit()
         elif event.sym == tcod.event.K_c:
             try:
-                return input_handlers.MainGameEventHandler(load_game(SAVE_FILE))
+                return input_handlers.MainGameEventHandler(
+                    load_game(constants.SAVE_FILE)
+                )
             except FileNotFoundError:
                 return input_handlers.PopupMessage(self, "No saved game to load")
             except Exception as e:

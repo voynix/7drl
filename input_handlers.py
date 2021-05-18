@@ -8,6 +8,7 @@ import tcod.event
 import actions
 from actions import Action, BumpAction, PickupAction, WaitAction
 import color
+import constants
 import exceptions
 
 if TYPE_CHECKING:
@@ -178,9 +179,8 @@ class MainGameEventHandler(EventHandler):
 
 class GameOverEventHandler(EventHandler):
     def on_quit(self) -> None:
-        # TODO: use the constant from setup_game w/out a dependency loop
-        if os.path.exists("savegame.sav"):
-            os.remove("savegame.sav")
+        if os.path.exists(constants.SAVE_FILE):
+            os.remove(constants.SAVE_FILE)
         raise exceptions.QuitWithoutSaving()
 
     def ev_quit(self, event: tcod.event.Quit) -> None:
