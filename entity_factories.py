@@ -79,12 +79,26 @@ FIREBALL_SCROLL = Item(
     stackable=True,
     consumable=FireballDamageConsumable(damage=12, radius=3),
 )
+FIREBALL_SCROLL_GREATER = Item(
+    char="~",
+    color=(255, 64, 64),
+    name="Fireball Scroll, Greater",
+    stackable=True,
+    consumable=FireballDamageConsumable(damage=40, radius=6),
+)
 HEALTH_POTION = Item(
     char="!",
     color=(127, 0, 255),
     name="Health Potion",
     stackable=True,
     consumable=HealingConsumable(amount=4),
+)
+HEALTH_POTION_GREATER = Item(
+    char="!",
+    color=(191, 64, 255),
+    name="Health Potion, Greater",
+    stackable=True,
+    consumable=HealingConsumable(amount=20),
 )
 LIGHTNING_SCROLL = Item(
     char="~",
