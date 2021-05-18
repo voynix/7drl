@@ -341,28 +341,12 @@ class InventoryEventHandler(AskUserEventHandler):
         super().on_render(console)
         number_of_items_in_inventory = len(self.engine.player.inventory.contents)
 
-        height = max(number_of_items_in_inventory + 2, 3)
-
-        if self.engine.player.x <= 30:
-            x = 40
-        else:
-            x = 0
-
+        x = 40 if self.engine.player.x <= 30 else 0
         y = 0
 
-        width = len(self.TITLE) + 4
+        height = max(number_of_items_in_inventory + 2, 3)
 
-        console.draw_frame(
-            x=x,
-            y=y,
-            width=width,
-            height=height,
-            title=self.TITLE,
-            clear=True,
-            fg=(255, 255, 255),
-            bg=(0, 0, 0),
-        )
-
+        item_strings = []
         if number_of_items_in_inventory > 0:
             for i, item_name in enumerate(self.engine.player.inventory.contents):
                 item_key = chr(ord("a") + i)
@@ -377,9 +361,25 @@ class InventoryEventHandler(AskUserEventHandler):
                 if self.engine.player.equipment.item_is_equipped(item_list[0]):
                     item_string = f"{item_string} (E)"
 
-                console.print(x + 1, y + i + 1, item_string)
+                item_strings.append(item_string)
         else:
-            console.print(x + 1, y + 1, "(Empty)")
+            item_strings.append("(Empty)")
+
+        width = max(len(self.TITLE) + 4, max(len(i) for i in item_strings) + 2)
+
+        console.draw_frame(
+            x=x,
+            y=y,
+            width=width,
+            height=height,
+            title=self.TITLE,
+            clear=True,
+            fg=(255, 255, 255),
+            bg=(0, 0, 0),
+        )
+
+        for i, item_string in enumerate(item_strings):
+            console.print(x + 1, y + 1 + i, item_string)
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
         player = self.engine.player
